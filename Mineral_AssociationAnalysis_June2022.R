@@ -1,8 +1,8 @@
 #Association Analysis
 
 library(readxl)
-MED_Ages_Locality <- read_excel("~/Downloads/MED_Ages_Locality.xlsx")
-MED_export <- read.delim("~/Downloads/MED_export.csv")
+MED_Ages_Locality <- read_excel("./data/association_data/MED_Ages_Locality.xlsx")
+MED_export <- read.delim("./data/association_data/MED_export.csv")
 #MED_export<-read.csv("~/Downloads/MED_export.csv")
 library(stringr)
 MED_export<-MED_export[which(str_count(MED_export$LLN,",")>2),]
@@ -31,15 +31,17 @@ MED_from2500MaTo540Ma<-MED_Age_merged[which(between(MED_Age_merged$`Max Age`,540
 
 MED_OlderThan2500Ma<-MED_OlderThan2500Ma[which(str_count(MED_OlderThan2500Ma$LLN,",")>2),]
 
+
+#__________________________________________________________
+# Run association analysis
+U.associated.mins <- strsplit(as.character(MED_export_bottom_level$MED_minerals_all),',')
+
 #length(U.associated.mins[[1]])
 MED_export_bottom_level$mindat_url[which.max(lengths(U.associated.mins))]
 which.max(lengths(U.associated.mins))
 max(lengths(U.associated.mins))
-#__________________________________________________________
-# Run association analysis
-
-U.associated.mins <- strsplit(as.character(MED_export_bottom_level$MED_minerals_all),',')
-U_associated_localities_minerals <- data.frame(locality=rep(MED_OlderThan2500Ma$mindat_id, sapply(U.associated.mins, FUN=length)), mineral=unlist(U.associated.mins),stringsAsFactors = F)
+#U_associated_localities_minerals <- data.frame(locality=rep(MED_OlderThan2500Ma$mindat_id,sapply(U.associated.mins, FUN=length)), mineral=unlist(U.associated.mins),stringsAsFactors = F)
+U_associated_localities_minerals <- data.frame(locality=rep(MED_OlderThan2500Ma$mindat_id, sum(sapply(U.associated.mins, FUN=length))), mineral=unlist(U.associated.mins),stringsAsFactors = F)
 
 # remove leading & trailing spaces from mineral names
 U_associated_localities_minerals$mineral <- sapply(U_associated_localities_minerals$mineral,function(x) {sub("^\\s+|^\\s+$","",x)})
@@ -107,7 +109,7 @@ Pred<-MED_export[which(str_detect(MED_export$MED_minerals_all,"Opal")&str_detect
 # Locality: Tecopa Basin 
 # Mindat ID: 255486
 
-USA_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_USA_localities_subset_cleaned.rds")
+USA_Rules<-readRDS("./data/association_data/Allmin_USA_localities_subset_cleaned.rds")
 USA_Rules@info$support
 
 Loc_Min<-strsplit(MED_export$MED_minerals_all[MED_export$mindat_id==255486],',')
@@ -152,7 +154,7 @@ MED_export$MED_minerals_all[MED_export$mindat_id==255486]
 # Data subset: Geochemical (U)
 # Predict locality for these rules. 
 
-U_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_U_localities_subset.rds")
+U_Rules<-readRDS("./data/association_data/Allmin_U_localities_subset.rds")
 U_Rules@info
 
 hist(U_Rules@quality$lift)
@@ -217,7 +219,7 @@ MED_export[!MED_export$MED_minerals_all %like% "Bayleyite" & MED_export$MED_mine
 # Data subsets: Archean, Proterozoic, Phanerozoic Eons
 # Minerals: Tephroite (Mn2+2SiO4), pyrite [Fe2+(S2)2-], akaganeite [(Fe3+,Ni2+)8(OH,O)16Cl1.25·nH2O]
 
-Temporal_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_OlderThan2500Ma_Rules_cleaned.rds")
+Temporal_Rules<-readRDS("./data/association_data/Allmin_OlderThan2500Ma_Rules_cleaned.rds")
 Temporal_Rules
 plot(Temporal_Rules, method = "graph", control=list(main = "Top 100 mineral association rules by lift for Archean Eon"))
 
@@ -251,7 +253,7 @@ plot(rules.sub.AP, method = "scatterplot", engine = "html")
 plot(rules.sub.AP, method = "grouped")
 
 
-Temporal_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_from2500MaTo540Ma_cleaned.rds")
+Temporal_Rules<-readRDS("./data/association_data/Allmin_from2500MaTo540Ma_cleaned.rds")
 Temporal_Rules@info
 plot(Temporal_Rules, method = "graph", )
 plot(Temporal_Rules, method = "grouped")
@@ -272,7 +274,7 @@ MED_export[!MED_export$MED_minerals_all %like% "Magnetite" & MED_export$MED_mine
 
 plot(rules.sub.AP, method = "grouped")
 
-Temporal_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_YoungerThan540Ma_cleaned.rds")
+Temporal_Rules<-readRDS("./data/association_data/Allmin_YoungerThan540Ma_cleaned.rds")
 Temporal_Rules@info
 
 plot(USA_Rules, method = "graph",engine = "html")
@@ -316,14 +318,14 @@ rescale(U_Rules@quality$lift, from = c(0, max(U_Rules@quality$lift)), to = c(0, 
 hist(rescale(U_Rules@quality$lift, from = c(0, max(U_Rules@quality$lift)), to = c(0, 100)))
 hist(rescale(USA_Rules@quality$lift, from = c(0, max(USA_Rules@quality$lift)), to = c(0, 100)))
 
-Temporal_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_OlderThan2500Ma_Rules_cleaned.rds")
+Temporal_Rules<-readRDS("./data/association_data/Allmin_OlderThan2500Ma_Rules_cleaned.rds")
 hist(rescale(Temporal_Rules@quality$lift, from = c(0, max(Temporal_Rules@quality$lift)), to = c(0, 100)), xlab = "Normalized Lift",main = "Distribution of Lift for Archean")
 
-Temporal_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_from2500MaTo540Ma_cleaned.rds")
+Temporal_Rules<-readRDS("./data/association_data/Allmin_from2500MaTo540Ma_cleaned.rds")
 hist(rescale(Temporal_Rules@quality$lift, from = c(0, max(Temporal_Rules@quality$lift)), to = c(0, 100)), xlab = "Normalized Lift",main = "Distribution of Lift for Proterozoic")
 #hist(Temporal_Rules@quality$lift)
 
-Temporal_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_YoungerThan540Ma_cleaned.rds")
+Temporal_Rules<-readRDS("./data/association_data/Allmin_YoungerThan540Ma_cleaned.rds")
 hist(rescale(Temporal_Rules@quality$lift, from = c(0, max(Temporal_Rules@quality$lift)), to = c(0, 100)), xlab = "Normalized Lift",main = "Distribution of Lift for Phanerazoic")
 #hist(Temporal_Rules@quality$lift)
 
@@ -332,7 +334,7 @@ hist(rescale(Temporal_Rules@quality$lift, from = c(0, max(Temporal_Rules@quality
 
 # USA subset and search for critical minerals
 
-USA_Rules<-readRDS("~/AssociationAnalysisRulesFiles2022/Allmin_USA_localities_subset_cleaned.rds")
+USA_Rules<-readRDS("./data/association_data/Allmin_USA_localities_subset_cleaned.rds")
 
 rules.sub.AP <- subset(USA_Rules, subset = (rhs %pin% "Monazite"))
 inspect(rules.sub.AP)
