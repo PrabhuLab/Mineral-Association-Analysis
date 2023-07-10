@@ -2,6 +2,7 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(shinydashboard)
+library(htmltools)
 
 elm_minerallist <- {c(
   "element-mineral_All"="em_all_elements",
@@ -1263,7 +1264,7 @@ shinyServer(function(input, output, session) {
       pop>100000
     )) %>%
       addTiles() %>%
-      addMarkers(lat = ~lat, lng = ~long)
+      addMarkers(lat = ~lat, lng = ~long, popup = ~htmlEscape(name))
   })
   
   #shinyjs::runjs("initJS();")#"document.body.addEventListener('click', function() {alert('hello')});")  
