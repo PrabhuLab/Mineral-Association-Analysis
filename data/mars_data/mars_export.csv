@@ -1,0 +1,41 @@
+sample_id,mars_minerals_all
+Rocknest,"Andesine,Forsterite,Augite,Pigeonite,Magnetite,Anhydrite,Quartz,Sanidine,Hematite,Ilmenite"
+John_Klein,"Andesine,Sanidine,Albite,Forsterite,Augite,Pigeonite,Orthopyroxene,Magnetite,Anhydrite,Bassanite,Quartz,Hematite,Akaganeite,Halite,Pyrite,Pyrrhotite"
+Cumberland,"Andesine,Sanidine,Forsterite,Augite,Pigeonite,Orthopyroxene,Magnetite,Anhydrite,Bassanite,Quartz,Hematite,Ilmenite,Akaganeite,Halite,Pyrrhotite,Clay"
+Windjana,"Plagioclase,K-Feldspar,Forsterite,Augite,Pigeonite,Enstatite,Magnetite,Anhydrite,Bassanite,Quartz,Hematite,Akaganeite,Pyrrhotite,Ilmenite,Clay"
+Confidence Hills,"Plagioclase,K-Feldspar,Forsterite,Augite,Pigeonite,Enstatite,Magnetite,Quartz,Hematite,Ilmenite,Jarosite,Clay"
+Mojave2,"Plagioclase,Augite,Pigeonite,Fe-Forsterite,Magnetite,Quartz,Hematite,Ilmenite,Jarosite,Apatite,Clay"
+Telegraph_Peak,"Plagioclase,K-Feldspar,Augite,Pigeonite,Enstatite,Magnetite,Quartz,Cristobalite,Opal-Ct,Hematite,Ilmenite,Anhydrite,Bassanite,Jarosite,Apatite"
+Buckskin,"Plagioclase,Tridymite,Sanidine,Magnetite,Cristobalite,Anhydrite"
+Big _Sky,"Plagioclase,Pigeonite,Orthopyroxene,Magnetite,Quartz,Tridymite,Hematite,Anhydrite"
+Greenhorn,"Plagioclase,Pigeonite,Orthopyroxene,Magnetite,Quartz,Hematite,Anhydrite,Bassanite"
+Gobabeb,"Plagioclase,Olivine,Augite,Pigeonite,Magnetite,Anhydrite,Quartz,Hematite"
+Lubango,"Plagioclase,Pigeonite,Orthopyroxene,Magnetite,Hematite,Quartz,Anhydrite,Bassanite,Gypsum"
+Okoruso,"Plagioclase,K-Feldspar,Pigeonite,Orthopyroxene,Magnetite,Hematite,Quartz,Anhydrite,Bassanite,Apatite"
+Oudam,"Plagioclase,Hematite,Pyroxene,Anhydrite,Gypsum,Quartz,Clay"
+Marimba,"Plagioclase,Hematite,Anhydrite,Sanidine,Gypsum,Forsterite,Pyroxene,Bassanite,Jarosite,Quartz,Clay"
+Quela,"Plagioclase,Hematite,Anhydrite,Sanidine,Pyroxene,Forsterite,Bassanite,Gypsum,Jarosite,Quartz,Clay"
+Sebina,"Plagioclase,Hematite,Anhydrite,Pyroxene,Sanidine,Gypsum,Forsterite,Jarosite,Bassanite,Quartz,Clay"
+Ogunquit_Beach,"Plagioclase,Forsterite,Augite,Pigeonite,Magnetite,Hematite,Anhydrite,Quartz,Clay"
+Duluth,"Plagioclase,Hematite,Sanidine,Pyroxene,Bassanite,Anhydrite,Gypsum,Magnetite,Quartz,Clay"
+Stoer,"Plagioclase,Hematite,Pyroxene,Anhydrite,Gypsum,Sanidine,Jarosite,Akaganeite,Quartz,Bassanite,Magnetite,Clay"
+Highfield,"Plagioclase,Hematite,Pyroxene,Anhydrite,Gypsum,Sanidine,Bassanite,Magnetite,Quartz,Clay"
+Rock_Hall,"Plagioclase,Anhydrite,Pyroxene,Akaganeite,Hematite,Jarosite,Apatite,Clay"
+Aberlady,"Plagioclase,Anhydrite,Bassanite,Pyroxene,Hematite,Sanidine,Quartz,Magnetite,Clay"
+Kilmarie,PlagioclaseAnhydritePyroxeneBassaniteSideriteHematiteSanidineQuartzClay
+Glen_Etive,PlagioclaseAnhydriteHematitePyroxeneSanidineBassaniteSideriteQuartzClay
+Glen_Etive_2,PlagioclasePyroxeneAnhydriteSanidineHematiteBassaniteQuartzClay
+Hutton,PlagioclasePyroxeneMagnetiteCristobaliteHematiteSanidineApatiteAnhydriteClay
+Edinburgh,PlagioclasePyroxeneMagnetiteFe-ForsteriteSanidineApatiteHematiteQuartzClay
+Glasgow,PlagioclaseAnhydriteHematitePyroxeneSanidineQuartzBassaniteApatiteCristobaliteClay
+Mary_Anning,PlagioclasePyroxeneSanidineAnhydriteFe-CarbonateHematiteQuartzClay
+Mary_Anning_3,PlagioclasePyroxeneSanidineBassaniteAnhydriteFe-CarbonateQuartzHematiteClay
+Groken,PlagioclaseAnhydritePyroxeneBassaniteFe-CarbonateSanidineQuartzClay
+Nontron,PlagioclaseHematitePyroxeneAnhydriteBassaniteSanidineGoethiteAnkeriteQuartzClay
+Bardou,PlagioclaseHematitePyroxeneBassaniteSanidineAnkeriteAnhydriteQuartzGypsumClay
+Pontours,PlagioclasePyroxeneHematiteSanidineBassaniteGypsumQuartzGoethiteHaliteClay
+Maria_Gordon,PlagioclaseHematitePyroxeneAlkali FeldsparGoethiteAnhydriteBassaniteGypsumQuartz
+Zechstein,PlagioclaseGypsumPyroxeneHematiteBassaniteQuartz
+Avanavero,PlagioclaseHematiteAnhydriteGoethitePyroxeneBassaniteSanidineQuartzIlmenite
+Canaima,AndesineHematiteGypsumSanidinePyroxene StarkeyiteGoethiteAnhydriteQuartzBassanite
+Tapo_Caparo,PlagioclaseSideritePyroxeneKieseriteBassaniteAnhydrite
