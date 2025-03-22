@@ -1,105 +1,105 @@
-#Association Analysis
-
+# #Association Analysis
+# 
 library(readxl)
-MED_Ages_Locality <- read_excel("./data/association_data/MED_Ages_Locality.xlsx")
-MED_export <- read.delim("./data/association_data/MED_export.csv")
-#MED_export<-read.csv("~/Downloads/MED_export.csv")
+# MED_Ages_Locality <- read_excel("./data/association_data/MED_Ages_Locality.xlsx")
+# MED_export <- read.delim("./data/association_data/MED_export.csv")
+# #MED_export<-read.csv("~/Downloads/MED_export.csv")
 library(stringr)
-MED_export<-MED_export[which(str_count(MED_export$LLN,",")>2),]
-
-#MED_export$MED_elements_all
-MED_export_bottom_level<-MED_export[which(MED_export$bottom_level==1),]
-
-
-# Matches Case
-
-MED_U_subset<-MED_export[which(str_detect(MED_export$MED_elements_all,"U")),]
-
-MED_USA_subset<-MED_export[which(str_detect(MED_export$LLN,"USA")),]
-
-#Remove all localities for Mindat locality id = 0
-MED_Ages_Locality_sub<-MED_Ages_Locality[which(MED_Ages_Locality$mindat_id!=0),]
-
-MED_Age_merged<-merge(MED_export,MED_Ages_Locality_sub, by = "mindat_id")
-
-MED_OlderThan2500Ma<-MED_Age_merged[which(MED_Age_merged$`Max Age`>2500),]
-
-MED_YoungerThan540Ma<-MED_Age_merged[which(MED_Age_merged$`Max Age`<540),]
-
+# MED_export<-MED_export[which(str_count(MED_export$LLN,",")>2),]
+# 
+# #MED_export$MED_elements_all
+# MED_export_bottom_level<-MED_export[which(MED_export$bottom_level==1),]
+# 
+# 
+# # Matches Case
+# 
+# MED_U_subset<-MED_export[which(str_detect(MED_export$MED_elements_all,"U")),]
+# 
+# MED_USA_subset<-MED_export[which(str_detect(MED_export$LLN,"USA")),]
+# 
+# #Remove all localities for Mindat locality id = 0
+# MED_Ages_Locality_sub<-MED_Ages_Locality[which(MED_Ages_Locality$mindat_id!=0),]
+# 
+# MED_Age_merged<-merge(MED_export,MED_Ages_Locality_sub, by = "mindat_id")
+# 
+# MED_OlderThan2500Ma<-MED_Age_merged[which(MED_Age_merged$`Max Age`>2500),]
+# 
+# MED_YoungerThan540Ma<-MED_Age_merged[which(MED_Age_merged$`Max Age`<540),]
+# 
 library(dplyr)
-MED_from2500MaTo540Ma<-MED_Age_merged[which(between(MED_Age_merged$`Max Age`,540,2500)),]
-
-MED_OlderThan2500Ma<-MED_OlderThan2500Ma[which(str_count(MED_OlderThan2500Ma$LLN,",")>2),]
-
-
-#__________________________________________________________
-# Run association analysis
-U.associated.mins <- strsplit(as.character(MED_export_bottom_level$MED_minerals_all),',')
-
-#length(U.associated.mins[[1]])
-MED_export_bottom_level$mindat_url[which.max(lengths(U.associated.mins))]
-which.max(lengths(U.associated.mins))
-max(lengths(U.associated.mins))
-#U_associated_localities_minerals <- data.frame(locality=rep(MED_OlderThan2500Ma$mindat_id,sapply(U.associated.mins, FUN=length)), mineral=unlist(U.associated.mins),stringsAsFactors = F)
-U_associated_localities_minerals <- data.frame(locality=rep(MED_OlderThan2500Ma$mindat_id, sum(sapply(U.associated.mins, FUN=length))), mineral=unlist(U.associated.mins),stringsAsFactors = F)
-
-# remove leading & trailing spaces from mineral names
-U_associated_localities_minerals$mineral <- sapply(U_associated_localities_minerals$mineral,function(x) {sub("^\\s+|^\\s+$","",x)})
-
-U_associated.loc.min <- U_associated_localities_minerals
-U_associated.loc.min$locality <- as.character(U_associated.loc.min$locality)
-U_associated.loc.min.mat <- as.data.frame.matrix(table(U_associated.loc.min[,1:2]))
-
-#U_associated.loc.min.mat
-
-U_associated_Min_Mat<-sapply(X = U_associated.loc.min.mat,FUN = function(x){replace(x, x > 0,1)})
-#U_associated.loc.min.mat[which(U_associated.loc.min.mat != 0)] <- 1
-dim(U_associated_Min_Mat)
-
-U_associated_Min_Mat <- as.data.frame(U_associated_Min_Mat)
-rownames(U_associated_Min_Mat) <- rownames(U_associated.loc.min.mat)
-
-U_associated.Min.Mat<-as.data.frame(unclass(U_associated_Min_Mat))
-
-#Logical Matrix Needed if only presence is to be considered. 
-U_associated.Min.Mat<-sapply(U_associated.loc.min.mat, as.logical)
-
+# MED_from2500MaTo540Ma<-MED_Age_merged[which(between(MED_Age_merged$`Max Age`,540,2500)),]
+# 
+# MED_OlderThan2500Ma<-MED_OlderThan2500Ma[which(str_count(MED_OlderThan2500Ma$LLN,",")>2),]
+# 
+# 
+# #__________________________________________________________
+# # Run association analysis
+# U.associated.mins <- strsplit(as.character(MED_export_bottom_level$MED_minerals_all),',')
+# 
+# #length(U.associated.mins[[1]])
+# MED_export_bottom_level$mindat_url[which.max(lengths(U.associated.mins))]
+# which.max(lengths(U.associated.mins))
+# max(lengths(U.associated.mins))
+# #U_associated_localities_minerals <- data.frame(locality=rep(MED_OlderThan2500Ma$mindat_id,sapply(U.associated.mins, FUN=length)), mineral=unlist(U.associated.mins),stringsAsFactors = F)
+# U_associated_localities_minerals <- data.frame(locality=rep(MED_OlderThan2500Ma$mindat_id, sum(sapply(U.associated.mins, FUN=length))), mineral=unlist(U.associated.mins),stringsAsFactors = F)
+# 
+# # remove leading & trailing spaces from mineral names
+# U_associated_localities_minerals$mineral <- sapply(U_associated_localities_minerals$mineral,function(x) {sub("^\\s+|^\\s+$","",x)})
+# 
+# U_associated.loc.min <- U_associated_localities_minerals
+# U_associated.loc.min$locality <- as.character(U_associated.loc.min$locality)
+# U_associated.loc.min.mat <- as.data.frame.matrix(table(U_associated.loc.min[,1:2]))
+# 
+# #U_associated.loc.min.mat
+# 
+# U_associated_Min_Mat<-sapply(X = U_associated.loc.min.mat,FUN = function(x){replace(x, x > 0,1)})
+# #U_associated.loc.min.mat[which(U_associated.loc.min.mat != 0)] <- 1
+# dim(U_associated_Min_Mat)
+# 
+# U_associated_Min_Mat <- as.data.frame(U_associated_Min_Mat)
+# rownames(U_associated_Min_Mat) <- rownames(U_associated.loc.min.mat)
+# 
+# U_associated.Min.Mat<-as.data.frame(unclass(U_associated_Min_Mat))
+# 
+# #Logical Matrix Needed if only presence is to be considered. 
+# U_associated.Min.Mat<-sapply(U_associated.loc.min.mat, as.logical)
+# 
 library(arules)
-rules_support_0_008 <- apriori(data = U_associated.Min.Mat, parameter = list(supp = 0.002, conf = 0.7,target = "rules",maxtime = 0,maxlen = 4,minlen = 1))
-
-
-
-saveRDS(rules_support_0_008, "Allmin_U_localities_subset.rds")
-#rules_support_0_0001 <- apriori(data = U_associated.Min.Mat, parameter = list(supp = 0.0001, conf = 0.7,target = "rules",maxtime = 0,maxlen = 30))
-
-#rules.sub.AP <- subset(rules_support_0_008, subset = ((lhs %pin% "Uraninite")))
-
-inspect(head(rules_support_0_008))
-
-#rules_support_0_008<-readRDS(file = "~/Allmin_OlderThan2500Ma_Rules.rds")
-rules <- rules_support_0_008[!is.redundant(rules_support_0_008)]
-saveRDS(rules, "Allmin_USA_localities_subset_cleaned.rds")
-
-inspect(head(rules, n = 10, by = "lift"))
-rules_by_lift <- sort(rules, by = "lift")
-
-
-library(arulesViz)
-plot(rules, method = "grouped")
-plot(rules, method = "paracoord")
-plot(rules, method = "graph")
-plot(rules, method = "matrix3D")
-
-summary(str_detect(MED_export$MED_minerals_all,"Cummingtonite")&str_detect(MED_export$MED_minerals_all,"Schreibersite")&str_detect(MED_export$MED_minerals_all,"Violarite")&str_detect(MED_export$MED_minerals_all,"Daubreelite",negate = TRUE))
-summary(str_detect(MED_export$MED_minerals_all,"Schreibersite"))
-summary(str_detect(MED_export$MED_minerals_all,"Violarite"))
-summary(str_detect(MED_export$MED_minerals_all,"Daubreelite",negate = TRUE))
-
-Pred<-MED_export[which(str_detect(MED_export$MED_minerals_all,"Siderophyllite")&str_detect(MED_export$MED_minerals_all,"Petalite")&str_detect(MED_export$MED_minerals_all,"Fluor-liddicoatite",negate = TRUE)),]
-
-Pred<-MED_export[which(str_detect(MED_export$MED_minerals_all,"Opal")&str_detect(MED_export$MED_minerals_all,"Pyrolusite")&str_detect(MED_export$MED_minerals_all,"Halotrichite",negate = TRUE)),]
-
-
+# rules_support_0_008 <- apriori(data = U_associated.Min.Mat, parameter = list(supp = 0.002, conf = 0.7,target = "rules",maxtime = 0,maxlen = 4,minlen = 1))
+# 
+# 
+# 
+# saveRDS(rules_support_0_008, "Allmin_U_localities_subset.rds")
+# #rules_support_0_0001 <- apriori(data = U_associated.Min.Mat, parameter = list(supp = 0.0001, conf = 0.7,target = "rules",maxtime = 0,maxlen = 30))
+# 
+# #rules.sub.AP <- subset(rules_support_0_008, subset = ((lhs %pin% "Uraninite")))
+# 
+# inspect(head(rules_support_0_008))
+# 
+# #rules_support_0_008<-readRDS(file = "~/Allmin_OlderThan2500Ma_Rules.rds")
+# rules <- rules_support_0_008[!is.redundant(rules_support_0_008)]
+# saveRDS(rules, "Allmin_USA_localities_subset_cleaned.rds")
+# 
+# inspect(head(rules, n = 10, by = "lift"))
+# rules_by_lift <- sort(rules, by = "lift")
+# 
+# 
+# library(arulesViz)
+# plot(rules, method = "grouped")
+# plot(rules, method = "paracoord")
+# plot(rules, method = "graph")
+# plot(rules, method = "matrix3D")
+# 
+# summary(str_detect(MED_export$MED_minerals_all,"Cummingtonite")&str_detect(MED_export$MED_minerals_all,"Schreibersite")&str_detect(MED_export$MED_minerals_all,"Violarite")&str_detect(MED_export$MED_minerals_all,"Daubreelite",negate = TRUE))
+# summary(str_detect(MED_export$MED_minerals_all,"Schreibersite"))
+# summary(str_detect(MED_export$MED_minerals_all,"Violarite"))
+# summary(str_detect(MED_export$MED_minerals_all,"Daubreelite",negate = TRUE))
+# 
+# Pred<-MED_export[which(str_detect(MED_export$MED_minerals_all,"Siderophyllite")&str_detect(MED_export$MED_minerals_all,"Petalite")&str_detect(MED_export$MED_minerals_all,"Fluor-liddicoatite",negate = TRUE)),]
+# 
+# Pred<-MED_export[which(str_detect(MED_export$MED_minerals_all,"Opal")&str_detect(MED_export$MED_minerals_all,"Pyrolusite")&str_detect(MED_export$MED_minerals_all,"Halotrichite",negate = TRUE)),]
+# 
+# 
 
 #_______________________________________________
 
@@ -108,7 +108,7 @@ Pred<-MED_export[which(str_detect(MED_export$MED_minerals_all,"Opal")&str_detect
 # Subset: USA
 # Locality: Tecopa Basin 
 # Mindat ID: 255486
-mars_export <- read.delim("./data/mars_data/mars_export.csv")
+mars_export <- read.csv("./data/mars_data/mars_export.csv")
 USA_Rules<-readRDS("./data/association_data/Allmin_USA_localities_subset_cleaned.rds")
 USA_Rules@info$support
 
@@ -117,25 +117,33 @@ Loc_Min<-strsplit(mars_export$mars_minerals_all[mars_export$sample_id=="Rocknest
 MinCombo<-combn(x = Loc_Min[[1]],m = 3)
 
 
-rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Analcime") & (lhs %pin% "Calcite") & (lhs %pin% "Opal")))
+# rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Analcime") & (lhs %pin% "Calcite") & (lhs %pin% "Opal")))
+# 
+# rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% Loc_Min[[1]])
+# 
+# rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
 
-rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% Loc_Min[[1]])
+# inspect(rules.sub.AP)
+# inspect(rules.sub.AP2)
+# 
+# inspect(union(rules.sub.AP,rules.sub.AP2))
 
-rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
-
-inspect(rules.sub.AP)
-inspect(rules.sub.AP2)
-
-inspect(union(rules.sub.AP,rules.sub.AP2))
-
+# NOTE courtesy of Ben Z, the following lines were part of a debug to just "skip"
+# rather than crash if not found in USA rules, still turning up empty handed
+#my_func <- function(x, table) {
+#  pos <- match(table, itemLabels(x))
+#  if (any(is.na(pos))) {
+#    FALSE
+#  }
+#  size(x[, pos]) == length(pos)
+#}
 
 for(i in 1:ncol(MinCombo))
-{
-  rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% Loc_Min[[1]])
-  rules.sub.AP <-union(rules.sub.AP,rules.sub.AP2)
-  inspect(rules.sub.AP)
+{ 
+    rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% Loc_Min[[1]])
+    rules.sub.AP <- union(rules.sub.AP,rules.sub.AP2)
+    inspect(rules.sub.AP)
 }
-
 
 inspect(rules.sub.AP)
 
@@ -147,7 +155,7 @@ aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max)
 Loc_Min
 
 mars_export$mars_minerals_all[mars_export$sample_id=="Rocknest"]
-
+write.table(rules_pred, './data/mars_data/mars_rules_pred.csv', append=TRUE)
 #_____________________________________________________________
 
 # Mineral Assemblage: Rutherfordine, Andersonite, Schröechingerite
