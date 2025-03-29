@@ -114,16 +114,18 @@ USA_Rules@info$support
 
 Loc_Min<-strsplit(mars_export$mars_minerals_all[mars_export$sample_id=="Rocknest"],',')
 
-MinCombo<-combn(x = Loc_Min[[1]],m = 3)
+filter_items <- intersect(Loc_Min[[1]], itemLabels(USA_Rules))
+
+MinCombo<-combn(x = filter_items,m = 3)
 
 
-# rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Analcime") & (lhs %pin% "Calcite") & (lhs %pin% "Opal")))
-# 
-# rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% Loc_Min[[1]])
-# 
+# rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Augite") | (lhs %pin% "Magnetite") | (lhs %pin% "Sanidine")))
+
+rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% filter_items) # This line needs to stay so there is something to union
+
 # rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
 
-# inspect(rules.sub.AP)
+inspect(rules.sub.AP)
 # inspect(rules.sub.AP2)
 # 
 # inspect(union(rules.sub.AP,rules.sub.AP2))
@@ -140,7 +142,8 @@ MinCombo<-combn(x = Loc_Min[[1]],m = 3)
 
 for(i in 1:ncol(MinCombo))
 { 
-    rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% Loc_Min[[1]])
+    rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% filter_items)
+    print(i)
     rules.sub.AP <- union(rules.sub.AP,rules.sub.AP2)
     inspect(rules.sub.AP)
 }
@@ -150,12 +153,13 @@ inspect(rules.sub.AP)
 rules_pred<-data.frame(lhs = labels(lhs(rules.sub.AP)),rhs = labels(rhs(rules.sub.AP)), 
                        rules.sub.AP@quality)
 
-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max)  
+mars_predictions<-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max)  
+mars_predictions$locality<-mars_export$sample_id[1] # To be replaced with i when we do this in for loop
 
 Loc_Min
 
 mars_export$mars_minerals_all[mars_export$sample_id=="Rocknest"]
-write.table(rules_pred, './data/mars_data/mars_rules_pred.csv', append=TRUE)
+write.table(mars_predictions, './data/mars_data/mars_rules_pred.csv', append=TRUE)
 #_____________________________________________________________
 
 # Mineral Assemblage: Rutherfordine, Andersonite, Schröechingerite
