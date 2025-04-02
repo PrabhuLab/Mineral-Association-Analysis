@@ -112,54 +112,64 @@ mars_export <- read.csv("./data/mars_data/mars_export.csv")
 USA_Rules<-readRDS("./data/association_data/Allmin_USA_localities_subset_cleaned.rds")
 USA_Rules@info$support
 
-Loc_Min<-strsplit(mars_export$mars_minerals_all[mars_export$sample_id=="Rocknest"],',')
+Location_List<-mars_export$sample_id #added 4/1
 
-filter_items <- intersect(Loc_Min[[1]], itemLabels(USA_Rules))
+# Some quick code to see which minerals are ignored for each location, added 4/1
 
-MinCombo<-combn(x = filter_items,m = 3)
-
-
-# rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Augite") | (lhs %pin% "Magnetite") | (lhs %pin% "Sanidine")))
-
-rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% filter_items) # This line needs to stay so there is something to union
-
-# rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
-
-inspect(rules.sub.AP)
-# inspect(rules.sub.AP2)
-# 
-# inspect(union(rules.sub.AP,rules.sub.AP2))
-
-# NOTE courtesy of Ben Z, the following lines were part of a debug to just "skip"
-# rather than crash if not found in USA rules, still turning up empty handed
-#my_func <- function(x, table) {
-#  pos <- match(table, itemLabels(x))
-#  if (any(is.na(pos))) {
-#    FALSE
-#  }
-#  size(x[, pos]) == length(pos)
-#}
-
-for(i in 1:ncol(MinCombo))
-{ 
-    rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% filter_items)
-    print(i)
-    rules.sub.AP <- union(rules.sub.AP,rules.sub.AP2)
-    inspect(rules.sub.AP)
+for(i in 1:length(Location_List)) {
+  Loc_Min<-strsplit(mars_export$mars_minerals_all[mars_export$sample_id==Location_List[i]],',')
+  
+  filter_items <- intersect(Loc_Min[[1]], itemLabels(USA_Rules))
+  ignored_items<- setdiff(Loc_Min[[1]], filter_items)
+  print(Location_List[i])
+  print(ignored_items)
 }
+# -------------- Start Looping Through MAA for each Location ------------------#
 
-inspect(rules.sub.AP)
+for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-key calls to be j indexed
 
-rules_pred<-data.frame(lhs = labels(lhs(rules.sub.AP)),rhs = labels(rhs(rules.sub.AP)), 
-                       rules.sub.AP@quality)
+    Loc_Min<-strsplit(mars_export$mars_minerals_all[mars_export$sample_id==Location_List[j]],',')
+    
+    filter_items <- intersect(Loc_Min[[1]], itemLabels(USA_Rules))
+    
+    MinCombo<-combn(x = filter_items,m = 3)
+    if (ncol(MinCombo)==0) { # Just adding this in case a location only has two minerals occurring
+        next
+    }
+    
+    # rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Augite") | (lhs %pin% "Magnetite") | (lhs %pin% "Sanidine")))
+    
+    rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% filter_items) # This line needs to stay so there is something to union
+    
+    # rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
+    
+    inspect(rules.sub.AP)
+    # inspect(rules.sub.AP2)
+    # 
+    # inspect(union(rules.sub.AP,rules.sub.AP2))
+    
+    
+    for(i in 1:ncol(MinCombo))
+    { 
+        rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% filter_items)
+        rules.sub.AP <- union(rules.sub.AP,rules.sub.AP2)
+        #inspect(rules.sub.AP)
+    }
+    
+    inspect(rules.sub.AP)
+    
+    rules_pred<-data.frame(lhs = labels(lhs(rules.sub.AP)),rhs = labels(rhs(rules.sub.AP)), 
+                           rules.sub.AP@quality)
+    
+    mars_predictions<-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max)  
+    mars_predictions$locality<-mars_export$sample_id[j] # To be replaced with i when we do this in for loop
+    
+    Loc_Min
+    
+    mars_export$mars_minerals_all[mars_export$sample_id==Location_List[j]]
+    write.table(mars_predictions, './data/mars_data/mars_rules_pred.csv', append=TRUE)
 
-mars_predictions<-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max)  
-mars_predictions$locality<-mars_export$sample_id[1] # To be replaced with i when we do this in for loop
-
-Loc_Min
-
-mars_export$mars_minerals_all[mars_export$sample_id=="Rocknest"]
-write.table(mars_predictions, './data/mars_data/mars_rules_pred.csv', append=TRUE)
+}
 #_____________________________________________________________
 
 # Mineral Assemblage: Rutherfordine, Andersonite, Schröechingerite
