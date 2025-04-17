@@ -112,6 +112,9 @@ mars_export <- read.csv("./data/mars_data/mars_export.csv")
 USA_Rules<-readRDS("./data/association_data/Allmin_USA_localities_subset_cleaned.rds")
 USA_Rules@info$support
 
+
+library(data.table)
+
 Location_List<-mars_export$sample_id #added 4/1
 
 # Some quick code to see which minerals are ignored for each location, added 4/1
@@ -157,12 +160,20 @@ for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-
     }
     
     inspect(rules.sub.AP)
-    
+    #
     rules_pred<-data.frame(lhs = labels(lhs(rules.sub.AP)),rhs = labels(rhs(rules.sub.AP)), 
                            rules.sub.AP@quality)
     
-    mars_predictions<-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max)  
-    mars_predictions$locality<-mars_export$sample_id[j] # To be replaced with i when we do this in for loop
+    # The old aggregation to be replaced one returning full rules for 1) highest confidence 2) highest lift
+    # mars_predictions<-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max) 
+    
+    rules_pred_copy <- data.table::copy(rules_pred) # Dataframe duplicate
+    max_conf <- filter(rules_pred, confidence==max(confidence), .by=rhs) #all best confidences
+    max_lift <- filter(rules_pred_copy, lift==max(lift), .by=rhs) # all best lifts
+    mars_predictions <- rbind(max_conf, max_lift) # Put both results in one df
+    mars_predictions <- sort_by(mars_predictions, mars_predictions[,2]) # Sorts by rhs
+    
+    mars_predictions$locality <- mars_export$sample_id[j] # Attaches the locality to the reading
     
     Loc_Min
     
