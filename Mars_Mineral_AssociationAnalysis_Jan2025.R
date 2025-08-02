@@ -127,59 +127,75 @@ for(i in 1:length(Location_List)) {
   print(Location_List[i])
   print(ignored_items)
 }
+
 # -------------- Start Looping Through MAA for each Location ------------------#
-
 for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-key calls to be j indexed
-
+#for(j in 1:1) { # If want FOR ROCKNEST ONLY comment out previous line. Also remove # for Section A and change output file name:
     Loc_Min<-strsplit(mars_export$mars_minerals_all[mars_export$sample_id==Location_List[j]],',')
     
     filter_items <- intersect(Loc_Min[[1]], itemLabels(USA_Rules))
-    
-    MinCombo<-combn(x = filter_items,m = 3)
-    if (ncol(MinCombo)==0) { # Just adding this in case a location only has two minerals occurring
+    for(k in 1:length(filter_items)) {
+      removed_mineral<-filter_items[k]
+      sublist<-filter_items[filter_items != removed_mineral]
+    # SECTION A: Run following section to remove one mineral
+    # ---- Selects random mineral to be removed from the list
+    #rand_number<-sample(1:length(filter_items),1)
+    #rand_mineral<-(filter_items[rand_number])
+    #filter_items<-filter_items[filter_items != rand_mineral]
+    # ---- End selection of random mineral to be removed
+        
+      MinCombo<-combn(x = sublist,m = 3)
+      if (ncol(MinCombo)==0) { # Just adding this in case a location only has two minerals occurring
+          next
+      }
+      
+      # rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Augite") | (lhs %pin% "Magnetite") | (lhs %pin% "Sanidine")))
+      
+      rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% sublist) # This line needs to stay so there is something to union
+      
+      # rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
+      
+      inspect(rules.sub.AP)
+      # inspect(rules.sub.AP2)
+      # 
+      # inspect(union(rules.sub.AP,rules.sub.AP2))
+      
+      
+      for(i in 1:ncol(MinCombo))
+      { 
+          rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% sublist)
+          rules.sub.AP <- union(rules.sub.AP,rules.sub.AP2)
+          #inspect(rules.sub.AP)
+      }
+      
+      inspect(rules.sub.AP)
+      #
+      rules_pred<-data.frame(lhs = labels(lhs(rules.sub.AP)),rhs = labels(rhs(rules.sub.AP)), 
+                             rules.sub.AP@quality)
+      
+      # The old aggregation to be replaced one returning full rules for 1) highest confidence 2) highest lift
+      # mars_predictions<-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max) 
+      
+      rules_pred_copy <- data.table::copy(rules_pred) # Dataframe duplicate
+      max_conf <- filter(rules_pred, confidence==max(confidence), .by=rhs) #all best confidences
+      max_lift <- filter(rules_pred_copy, lift==max(lift), .by=rhs) # all best lifts
+      mars_predictions <- rbind(max_conf, max_lift) # Put both results in one df
+      mars_predictions <- sort_by(mars_predictions, mars_predictions[,2]) # Sorts by rhs
+      mars_predictions <- filter(mars_predictions, rhs==removed_mineral) # For when you only want specific predictions
+      if(nrow(mars_predictions)==0){
         next
+      }
+      mars_predictions$locality <- mars_export$sample_id[j] # Attaches the locality to the reading
+      
+      Loc_Min
+      
+      mars_export$mars_minerals_all[mars_export$sample_id==Location_List[j]]
+      if(length(mars_predictions)==0) {
+        failed_attempt<-data.table(locality = mars_export$sample_id[j], mineral = removed_mineral)
+        write.table(failed_attempt, './data/mars_data/failed_proof_of_concept.csv', append=TRUE)
+      }
+      write.table(mars_predictions, './data/mars_data/proof_of_concept.csv', append=TRUE)
     }
-    
-    # rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Augite") | (lhs %pin% "Magnetite") | (lhs %pin% "Sanidine")))
-    
-    rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% filter_items) # This line needs to stay so there is something to union
-    
-    # rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
-    
-    inspect(rules.sub.AP)
-    # inspect(rules.sub.AP2)
-    # 
-    # inspect(union(rules.sub.AP,rules.sub.AP2))
-    
-    
-    for(i in 1:ncol(MinCombo))
-    { 
-        rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% filter_items)
-        rules.sub.AP <- union(rules.sub.AP,rules.sub.AP2)
-        #inspect(rules.sub.AP)
-    }
-    
-    inspect(rules.sub.AP)
-    #
-    rules_pred<-data.frame(lhs = labels(lhs(rules.sub.AP)),rhs = labels(rhs(rules.sub.AP)), 
-                           rules.sub.AP@quality)
-    
-    # The old aggregation to be replaced one returning full rules for 1) highest confidence 2) highest lift
-    # mars_predictions<-aggregate(x = rules_pred[,4:6], by = list(rules_pred$rhs), FUN = max) 
-    
-    rules_pred_copy <- data.table::copy(rules_pred) # Dataframe duplicate
-    max_conf <- filter(rules_pred, confidence==max(confidence), .by=rhs) #all best confidences
-    max_lift <- filter(rules_pred_copy, lift==max(lift), .by=rhs) # all best lifts
-    mars_predictions <- rbind(max_conf, max_lift) # Put both results in one df
-    mars_predictions <- sort_by(mars_predictions, mars_predictions[,2]) # Sorts by rhs
-    
-    mars_predictions$locality <- mars_export$sample_id[j] # Attaches the locality to the reading
-    
-    Loc_Min
-    
-    mars_export$mars_minerals_all[mars_export$sample_id==Location_List[j]]
-    write.table(mars_predictions, './data/mars_data/mars_rules_pred.csv', append=TRUE)
-
 }
 #_____________________________________________________________
 
