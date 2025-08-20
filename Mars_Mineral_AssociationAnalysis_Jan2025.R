@@ -137,6 +137,7 @@ for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-
     for(k in 1:length(filter_items)) {
       removed_mineral<-filter_items[k]
       sublist<-filter_items[filter_items != removed_mineral]
+      removed_mineral_as_list<-filter_items[filter_items == removed_mineral]
     # SECTION A: Run following section to remove one mineral
     # ---- Selects random mineral to be removed from the list
     #rand_number<-sample(1:length(filter_items),1)
@@ -163,7 +164,9 @@ for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-
       
       for(i in 1:ncol(MinCombo))
       { 
-          rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% sublist)
+          #rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & !rhs %in% sublist)
+          #TEMP LINE, remove and replace with above line for normal MAA
+          rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,i] & rhs %in% removed_mineral_as_list)
           rules.sub.AP <- union(rules.sub.AP,rules.sub.AP2)
           #inspect(rules.sub.AP)
       }
@@ -181,10 +184,8 @@ for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-
       max_lift <- filter(rules_pred_copy, lift==max(lift), .by=rhs) # all best lifts
       mars_predictions <- rbind(max_conf, max_lift) # Put both results in one df
       mars_predictions <- sort_by(mars_predictions, mars_predictions[,2]) # Sorts by rhs
-      mars_predictions <- filter(mars_predictions, rhs==removed_mineral) # For when you only want specific predictions
-      if(nrow(mars_predictions)==0){
-        next
-      }
+      # NOT WORKING: mars_predictions <- filter(mars_predictions, rhs==removed_mineral) # For when you only want specific predictions
+  
       mars_predictions$locality <- mars_export$sample_id[j] # Attaches the locality to the reading
       
       Loc_Min
