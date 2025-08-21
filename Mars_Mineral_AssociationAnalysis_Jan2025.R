@@ -127,10 +127,7 @@ for(i in 1:length(Location_List)) {
   print(Location_List[i])
   print(ignored_items)
 }
-
-# -------------- Start Looping Through MAA for each Location ------------------#
-for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-key calls to be j indexed
-#for(j in 1:1) { # If want FOR ROCKNEST ONLY comment out previous line. Also remove # for Section A and change output file name:
+ { # If want FOR ROCKNEST ONLY comment out previous line. Also remove # for Section A and change output file name:
     Loc_Min<-strsplit(mars_export$mars_minerals_all[mars_export$sample_id==Location_List[j]],',')
     
     filter_items <- intersect(Loc_Min[[1]], itemLabels(USA_Rules))
@@ -151,9 +148,9 @@ for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-
       }
       
       # rules.sub.AP <- subset(USA_Rules, subset = ((lhs %pin% "Augite") | (lhs %pin% "Magnetite") | (lhs %pin% "Sanidine")))
-      
-      rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% sublist) # This line needs to stay so there is something to union
-      
+      #rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & !rhs %in% sublist) # This line needs to stay so there is something to union
+      #TEMP LINE, remove and replace with above line for normal MAA
+      rules.sub.AP <- subset(USA_Rules, subset = lhs %ain% MinCombo[,1] & rhs %in% removed_mineral_as_list)
       # rules.sub.AP2 <- subset(USA_Rules, subset = lhs %ain% MinCombo[,32] & !rhs %in% Loc_Min[[1]])
       
       inspect(rules.sub.AP)
@@ -172,7 +169,12 @@ for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-
       }
       
       inspect(rules.sub.AP)
-      #
+      # The following line breaks if there are no predictions because lhs and rhs return empty brackets, but @quality returns no values (support, conf, lift, etc)
+      if(nrow(rules.sub.AP@quality)==0) {
+          failed_attempt<-data.table(locality = mars_export$sample_id[j], mineral = removed_mineral)
+          write.table(failed_attempt, './data/mars_data/failed_proof_of_concept.csv', append=TRUE)
+          next
+      }
       rules_pred<-data.frame(lhs = labels(lhs(rules.sub.AP)),rhs = labels(rhs(rules.sub.AP)), 
                              rules.sub.AP@quality)
       
@@ -191,10 +193,7 @@ for(j in 1:length(Location_List)) { # added 4/1 to automate all, changed string-
       Loc_Min
       
       mars_export$mars_minerals_all[mars_export$sample_id==Location_List[j]]
-      if(length(mars_predictions)==0) {
-        failed_attempt<-data.table(locality = mars_export$sample_id[j], mineral = removed_mineral)
-        write.table(failed_attempt, './data/mars_data/failed_proof_of_concept.csv', append=TRUE)
-      }
+      
       write.table(mars_predictions, './data/mars_data/proof_of_concept.csv', append=TRUE)
     }
 }
